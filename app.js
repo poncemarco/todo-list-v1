@@ -2,13 +2,17 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const app = express();
+app.set('view engine', 'ejs');
 
 app.get("/", function(req, res){
     var today = new Date();
+    var day = ""
     if (today.getDate() === 6 || today.getDay() === 0 ){
-        res.send("Yay its the weekend")
+        day = "Weekend"
+        res.render('list', {kindOfDay: day})
     } else {
-        res.sendFile(__dirname + "/index.html");
+        day = "Work day"
+        res.render('list', {kindOfDay: day});
     }
 });
 
