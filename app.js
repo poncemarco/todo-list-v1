@@ -1,44 +1,48 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const getDate = require("./date");
+const date = require(__dirname + "/date.js")
 
 const app = express();
+
+var items = ["Wake up at 7", "Drink water"];
+let workItems = ["Write the essay"];
 app.set('view engine', 'ejs');
 
-app.get("/", function(req, res){
-    var today = new Date();
-    var day = "";
-    var currentDay = today.getDay();
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static("public"));
 
-    switch (currentDay){
-        case 0:
-            day = "Sunday";
-            break;
-        case 1:
-            day = "Monday";
-            break;
-        case 2:
-            day = "Tuesday";
-            break;
-        case 3:
-            day = "Wednesday";
-            break;
-        case 4:
-            day="Thursay";
-            break;
-        case 5:
-            day = "Friday";
-            break;
-        case 6: 
-            day = "Saturday"
-            break;
-        default:
-            console.log("Somethig go wrong:" + currentDay)
-    } 
+app.get("/", function(req, res){
+    
+    let day = getDate.getDay();
     res.render("list", {
-        kindOfDay: day
-    })       
+        items: items,
+        listTitle: "ToDo  " + day,
+        
+    })
+});
+
+app.post("/", function(req, res) {
+    let item = req.body.newItem;
+    console.log(req.body.list);
+    if (req.body.list === "W ork"){
+        workItems.push(item);
+        res.redirect("/work");
+    } else {
+        items.push(item);
+        res.redirect("/");
+    }
+});
+
+app.get("/work", function(req, res){
+    res.render("list", {listTitle: "Work", items: workItems});
+});
+app.post("/work", function(req, res){
+    let item = req.body.newItem;
+    workItems.push(item);
+    res.redirect("/")
 });
 
 app.listen(3000, function(){
     console.log("Server started on port 3000")
-})
+});
